@@ -38,15 +38,17 @@ with open("output.srt", "w") as f:
     # get average across whole image
     average_contrast = 100*np.mean(contrast)
     
-    f.write(str(capture.CAP_PROP_POS_FRAMES))
+    pos = capture.get(cv.CAP_PROP_POS_FRAMES)
 
-    milliseconds = capture.CAP_PROP_POS_MSEC
+    f.write(f'{str(pos)}\n')
+
+    milliseconds = capture.get(cv.CAP_PROP_POS_MSEC)
     seconds, milliseconds = divmod(milliseconds, 1000)
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
 
     current_timestamp = f'{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d},{int(milliseconds):03d}'
-    f.write(f'{previous_timestamp} --> {current_timestamp}')
+    f.write(f'{previous_timestamp} --> {current_timestamp}\n')
     previous_timestamp = current_timestamp
-    f.write(str(average_contrast)+'%')
-    f.write('')
+    f.write(f'{round(average_contrast)}%\n')
+    f.write('\n')
