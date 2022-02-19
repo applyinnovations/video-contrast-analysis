@@ -16,28 +16,7 @@ with open("output.srt", "w") as f:
     ret, frame = capture.read()
     if frame is None:
         break
-    
-    # convert to LAB color space
-    lab = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
 
-    # separate channels
-    L,A,B=cv.split(lab)
-
-    # compute minimum and maximum in 5x5 region using erode and dilate
-    kernel = np.ones((5,5),np.uint8)
-    min = cv.erode(L,kernel,iterations = 1)
-    max = cv.dilate(L,kernel,iterations = 1)
-
-    # convert min and max to floats
-    min = min.astype(np.float64) 
-    max = max.astype(np.float64) 
-
-    # compute local contrast
-    contrast = (max-min)/(max+min)
-
-    # get average across whole image
-    average_contrast = 100*np.mean(contrast)
-    
     pos = capture.get(cv.CAP_PROP_POS_FRAMES)
 
     f.write(f'{str(pos)}\n')
@@ -50,5 +29,49 @@ with open("output.srt", "w") as f:
     current_timestamp = f'{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d},{int(milliseconds):03d}'
     f.write(f'{previous_timestamp} --> {current_timestamp}\n')
     previous_timestamp = current_timestamp
-    f.write(f'{round(average_contrast)}%\n')
+
+    # Contrast
+    lab = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
+    L,A,B=cv.split(lab)
+
+    # compute minimum and maximum in 5x5 region using erode and dilate
+    kernel = np.ones((5,5),np.uint8)
+    min = cv.erode(L,kernel,iterations = 1)
+    max = cv.dilate(L,kernel,iterations = 1)
+
+    min = min.astype(np.float64) 
+    max = max.astype(np.float64) 
+    
+    contrast = (max-min)/(max+min)
+    average_contrast = 100*np.mean(contrast)
+    
+    # Lightness
+    average_lightness = np.mean(L) / 2.55
+
+    # Brightness
+    hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+    H,S,V=cv.split(hsv)    
+    average_brightness = np.mean(V) / 2.55
+
+    # Color count
+    rgb = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+    colors = np.dot(rgb.astype(np.uint32),[1,256,65536]) 
+    unique_color_count = len(np.unique(colors))
+
+    # Warmth
+    R,G,B=cv.split(rgb) 
+    red = np.mean(R)
+    blue = np.mean(B)
+    temperature = 'warm' if red > blue else 'cool'
+
+    # write to output
+    f.write(f'contrast     {round(average_contrast):3d}%\n')
+    f.write(f'lightness    {round(average_lightness):3d}%\n')
+    f.write(f'brightness   {round(average_brightness):3d}%\n')
+    f.write(f'colors       {round(unique_color_count / 1000):3d}k\n')
+    f.write(f'temperature  {temperature}\n')
+
+
+    # cv.imshow('frame', frame)
+
     f.write('\n')
