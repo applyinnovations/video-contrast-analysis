@@ -5,20 +5,24 @@ Utility functions
 """
 
 from configparser import ConfigParser
+from os import path
 
-from video_contrast_analysis import CONFIG_FILEPATH
 
-
-def get_config():
+def get_config(config_filepath):
     """
     Get parsed config from file or None if nonexistent
+
+    :param config_filepath: config filepath
+    :type config_filepath: ```str```
 
     :return: ConfigParser or None
     :rtype: ```Optional[ConfigParser]```
     """
+    if not path.isfile(config_filepath):
+        return None
     config = ConfigParser()
-    with open(CONFIG_FILEPATH, "rt") as f:
-        config.read_file(f, CONFIG_FILEPATH)
+    with open(config_filepath, "rt") as f:
+        config.read_file(f, config_filepath)
     return config
 
 

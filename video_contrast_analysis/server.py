@@ -9,7 +9,7 @@ from os import environ
 
 from bottle import post, request, run
 
-import video_contrast_analysis as video_contrast_analysis_mod
+import video_contrast_analysis.globals as globals
 from video_contrast_analysis.analysis import video_contrast_analysis
 
 
@@ -22,13 +22,13 @@ def set_config_route():
     :rtype: ```dict```
     """
     config_s = request.body.read().decode("utf-8")
-    with open(video_contrast_analysis_mod.CONFIG_FILEPATH, "wt") as f:
+    with open(globals.CONFIG_FILEPATH, "wt") as f:
         f.write(config_s)
 
-    video_contrast_analysis_mod.CONFIG = ConfigParser()
-    video_contrast_analysis_mod.CONFIG.read_string(config_s)
+    globals.CONFIG = ConfigParser()
+    globals.CONFIG.read_string(config_s)
 
-    return {"config_written_to": video_contrast_analysis_mod.CONFIG_FILEPATH}
+    return {"config_written_to": globals.CONFIG_FILEPATH}
 
 
 @post("/api/py/analyse/<video_file>/<subtitle_file>")

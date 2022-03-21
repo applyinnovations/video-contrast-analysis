@@ -1,14 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-from os import environ, getcwd, path
-
-from video_contrast_analysis.utils import get_config
 
 __author__ = "Alex Bunn & Samuel Marks"
 __version__ = "0.0.1"
 
-CONFIG_FILEPATH = environ.get("CONFIG_FILEPATH", path.join(getcwd(), "config.ini"))
-CONFIG = get_config()
-
-__all__ = ["CONFIG_FILEPATH", "CONFIG", "__author__", "__version__"]
+__all__ = ["__author__", "__version__"]
