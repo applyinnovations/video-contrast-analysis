@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
   
-inputfile = 'test.mov'
+inputfile = 'test.mp4'
 capture = cv.VideoCapture(cv.samples.findFileOrKeep(inputfile))
 
 with open("output.srt", "w") as f:
@@ -31,21 +31,12 @@ with open("output.srt", "w") as f:
       f.write(f'{previous_timestamp} --> {current_timestamp}\n')
 
       # Contrast
-      lab = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
-      L,A,B=cv.split(lab)
-
-      # compute minimum and maximum in 5x5 region using erode and dilate
-      kernel = np.ones((5,5),np.uint8)
-      min = cv.erode(L,kernel,iterations = 1)
-      max = cv.dilate(L,kernel,iterations = 1)
-
-      min = min.astype(np.float64) 
-      max = max.astype(np.float64) 
-      
-      contrast = (max-min)/(max+min)
-      average_contrast = 100*np.mean(contrast)
+      gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+      average_contrast = gray.std()
       
       # Lightness
+      lab = cv.cvtColor(frame, cv.COLOR_BGR2LAB)
+      L,A,B=cv.split(lab)
       average_lightness = np.mean(L) / 2.55
 
       # Brightness
@@ -65,10 +56,10 @@ with open("output.srt", "w") as f:
       temperature = 'warm' if red > blue else 'cool'
 
       # write to output
-      f.write(f'contrast {int(round(average_contrast))}%\n')
-      f.write(f'lightness {int(round(average_lightness))}%\n')
-      f.write(f'brightness {int(round(average_brightness))}%\n')
-      f.write(f'colors {int(round(unique_color_count / 1000))}k\n')
+      f.write(f'contrast {float(round(np.nan_to_num(average_contrast, 0), 3)):.0f}%\n')
+      f.write(f'lightness {float(round(average_lightness, 3)):.0f}%\n')
+      f.write(f'brightness {float(round(average_brightness, 3)):.0f}%\n')
+      f.write(f'colors {int(round(unique_color_count / 1000, 3))}k\n')
       f.write(f'temperature {temperature}\n')
 
       f.write('\n')
