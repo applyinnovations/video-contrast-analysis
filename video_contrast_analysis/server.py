@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+"""
+REST API
+"""
+
 from configparser import ConfigParser
 from os import environ
 

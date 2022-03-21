@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+Video contrast analysis implementation
+"""
+
 import cv2 as cv
 import numpy as np
 
@@ -87,3 +91,5 @@ def video_contrast_analysis(video_file, subtitle_file):
                 )
 
             previous_timestamp = current_timestamp
+
+__all__ = ["video_contrast_analysis"]

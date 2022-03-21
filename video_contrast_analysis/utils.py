@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+"""
+Utility functions
+"""
+
 from configparser import ConfigParser
 
 from video_contrast_analysis import CONFIG_FILEPATH
