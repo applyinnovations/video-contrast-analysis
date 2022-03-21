@@ -1,0 +1,17 @@
+# Be sure to find/replace:
+#   - `VENV` to abspath two dirs above your Python binary'
+#   - `VARS` to abspath for your working directory
+
+[Unit]
+Description=Video contrast analysis bucket watching service
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=VENV/bin/python -m video_contrast_analysis.server
+Environment="PATH=VENV/bin:$PATH"
+WorkingDirectory=VARS
+
+[Install]
+WantedBy=multi-user.target

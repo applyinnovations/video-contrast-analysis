@@ -12,16 +12,14 @@ from google.auth.credentials import CredentialsWithQuotaProject
 
 from video_contrast_analysis.globals import CONFIG, CONFIG_FILEPATH
 
+from google.cloud import storage
+
 if CONFIG is None:
     raise FileNotFoundError(
         '{CONFIG_FILEPATH!r} must be present for "gcloud_bucket_proc.py" to run'.format(
             CONFIG_FILEPATH=CONFIG_FILEPATH
         )
     )
-
-from google.cloud import storage
-
-# Instantiates a client
 
 
 class CredentialsRefreshable(CredentialsWithQuotaProject):
