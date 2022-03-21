@@ -65,11 +65,11 @@ with open("output.srt", "w") as f:
       temperature = 'warm' if red > blue else 'cool'
 
       # write to output
-      f.write(f'contrast     {int(round(average_contrast)):3d}%\n')
-      f.write(f'lightness    {int(round(average_lightness)):3d}%\n')
-      f.write(f'brightness   {int(round(average_brightness)):3d}%\n')
-      f.write(f'colors       {int(round(unique_color_count / 1000)):3d}k\n')
-      f.write(f'temperature  {temperature}\n')
+      f.write(f'contrast {int(round(average_contrast)):3d}%\n')
+      f.write(f'lightness {int(round(average_lightness)):3d}%\n')
+      f.write(f'brightness {int(round(average_brightness)):3d}%\n')
+      f.write(f'colors {int(round(unique_color_count / 1000)):3d}k\n')
+      f.write(f'temperature {temperature}\n')
 
       f.write('\n')
     previous_timestamp = current_timestamp
