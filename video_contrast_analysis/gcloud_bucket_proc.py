@@ -6,13 +6,18 @@ Google Cloud Bucket module, with functions to:
   - run when supported file is uploaded to bucket;
   - upload result of run to same bucket.
 """
+
+import json
+
 from datetime import datetime
 
 from google.auth.credentials import CredentialsWithQuotaProject
 
 from video_contrast_analysis.globals import CONFIG, CONFIG_FILEPATH
 
-from google.cloud import storage
+from google.cloud import storage, pubsub_v1
+
+from analysis import video_contrast_analysis
 
 if CONFIG is None:
     raise FileNotFoundError(
@@ -31,13 +36,72 @@ class CredentialsRefreshable(CredentialsWithQuotaProject):
         pass  # TODO
 
 
+project_id = CONFIG["user"]["google_project_id"]
 creds = CredentialsRefreshable()
 creds.token = CONFIG["user"]["google_access_token"]
-creds._quota_project_id = CONFIG["user"]["google_project_id"]
+creds._quota_project_id = project_id
 creds.expiry = datetime.utcfromtimestamp(
     int(CONFIG["user"]["google_access_token_expiry"])
 )
 storage_client = storage.Client(
-    project=CONFIG["user"]["google_project_id"], credentials=creds
+    project=project_id, credentials=creds
 )
-print("storage_client.list_buckets:", list(storage_client.list_buckets()), ";")
+
+# create topic to listen to the bucket
+topic_name = "" # TODO: this should be unique per cloud instance
+bucket = storage_client.bucket(CONFIG["user"]["google_bucket_name"])
+notification = bucket.notification(topic_name)
+notification.create()
+
+# define path to subscribe to
+subscriber = pubsub_v1.SubscriberClient()
+subscription_path = subscriber.subscription_path(project_id, topic_name)
+
+# define callback to run when subscription received
+def callback(message):
+    print("Received message:\n")
+    message.ack()
+    attributes = message.attributes
+    data = message.data.decode("utf-8")
+    
+    # event_type = attributes["eventType"]
+    # bucket_id = attributes["bucketId"]
+    object_id = attributes["objectId"]
+    # generation = attributes["objectGeneration"]
+    print(attributes)
+
+    if attributes["payloadFormat"] == "JSON_API_V1":
+        object_metadata = json.loads(data)
+        # size = object_metadata["size"]
+        # content_type = object_metadata["contentType"]
+        # metageneration = object_metadata["metageneration"]
+        print(object_metadata)
+
+    if message.attributes.eventType == "OBJECT_FINALIZE": # TODO: check that the content_type is supported by opencv
+        # new file was created / updeated
+        in_fname = 'video'
+        out_fname = 'video_contrast_analysis.srt'
+
+        with open(in_fname, 'wb') as f:
+            storage_client.download_blob_to_file(object_id, f)
+
+        try:
+            video_contrast_analysis(in_fname, out_fname)
+        except:
+            print('Processing step failed')
+
+        blob = bucket.blob("{}_{}".format(object_id, out_fname))
+        blob.upload_from_filename(out_fname)
+
+# subscribe to the subscription path
+subscriber.subscribe(subscription_path, callback=callback)
+
+# The subscriber is non-blocking, so we must keep the main thread from
+# exiting to allow it to process messages in the background.
+print("Listening for messages on {}".format(subscription_path))
+
+while True:
+    time.sleep(60) # TODO: this may not be needed idk depends if this is done elsewhere
+
+# TODO: when instance has ended need to delete the subscription that was created
+# notification.delete()
