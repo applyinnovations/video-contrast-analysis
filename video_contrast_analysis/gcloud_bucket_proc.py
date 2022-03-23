@@ -82,16 +82,15 @@ def callback(message):
         in_fname = 'video'
         out_fname = 'video_contrast_analysis.srt'
 
-        with open(in_fname, 'wb') as f:
-            storage_client.download_blob_to_file(object_id, f)
-
         try:
+            with open(in_fname, 'wb') as f:
+                storage_client.download_blob_to_file(object_id, f)
             video_contrast_analysis(in_fname, out_fname)
+            blob = bucket.blob("{}_{}".format(object_id, out_fname))
+            blob.upload_from_filename(out_fname)
+
         except:
             print('Processing step failed')
-
-        blob = bucket.blob("{}_{}".format(object_id, out_fname))
-        blob.upload_from_filename(out_fname)
 
 # subscribe to the subscription path
 subscriber.subscribe(subscription_path, callback=callback)
