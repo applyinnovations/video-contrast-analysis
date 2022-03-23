@@ -96,12 +96,13 @@ def callback(message):
 # subscribe to the subscription path
 subscriber.subscribe(subscription_path, callback=callback)
 
-# The subscriber is non-blocking, so we must keep the main thread from
-# exiting to allow it to process messages in the background.
 print("Listening for messages on {}".format(subscription_path))
 
+# TODO: [question for Sam] this may not be needed depends if this is done elsewhere
+# The subscriber is non-blocking, so we must keep the main thread from
+# exiting to allow it to process messages in the background.
 while True:
-    time.sleep(60) # TODO: this may not be needed idk depends if this is done elsewhere
+    time.sleep(60) 
 
-# TODO: when instance has ended need to delete the subscription that was created
+# TODO: [question for Sam] when instance has ended need to delete the subscription that was created
 # notification.delete()
