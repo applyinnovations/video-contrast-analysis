@@ -15,6 +15,7 @@ sudo python3 -m pip install -U setuptools wheel
 sudo mkdir -p "$VENV" "$VARS"
 sudo chown -R $USER:$GROUP "$VENV" "$VARS"
 python3 -m venv --system-site-packages "$VENV"
+"$VENV"'/bin/python' -m pip install -r 'https://raw.githubusercontent.com/applyinnovations/video-contrast-analysis/master/requirements.txt'
 "$VENV"'/bin/python' -m pip install -e 'git+https://github.com/applyinnovations/video-contrast-analysis@server#egg=video_contrast_analysis'
 
 sudo sed 's|VENV|'"$VENV"'|g; s|VARS|'"$VARS"'|g' "$VCA_SERVICE" > '/etc/systemd/system/'"$VCA_SERVICE"
@@ -25,4 +26,5 @@ sudo systemctl daemon-reload
 for service in "$SERVICE" "$VCA_SERVICE"; do
   sudo systemctl enable "$service"
   sudo systemctl start "$service"
+  ( sleep 30 && journalctl --no-pager -u "$service" -n 100 ) &
 done

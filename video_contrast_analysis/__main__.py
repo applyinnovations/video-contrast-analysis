@@ -6,6 +6,7 @@ CLI
 
 from argparse import ArgumentParser
 
+from video_contrast_analysis import __version__
 from video_contrast_analysis.analysis import video_contrast_analysis
 
 
@@ -33,6 +34,7 @@ def _build_parser():
         required=True,
         dest="subtitle_file",
     )
+    parser.add_argument("--version", action="version", version=__version__)
     return parser
 
 

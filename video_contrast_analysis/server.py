@@ -7,10 +7,29 @@ REST API
 from configparser import ConfigParser
 from os import environ
 
-from bottle import post, request, run
+from bottle import get, post, request, run
 
 import video_contrast_analysis.globals as globals
+from video_contrast_analysis import __version__
 from video_contrast_analysis.analysis import video_contrast_analysis
+
+
+@get("/api/py")
+def version():
+    """
+    Set [global] config from request body and store to disk
+
+    :return: dict with key "config_written_to" with path to config file
+    :rtype: ```dict```
+    """
+    config_s = request.body.read().decode("utf-8")
+    with open(globals.CONFIG_FILEPATH, "wt") as f:
+        f.write(config_s)
+
+    globals.CONFIG = ConfigParser()
+    globals.CONFIG.read_string(config_s)
+
+    return {"version": __version__}
 
 
 @post("/api/py/set_config")
@@ -51,7 +70,7 @@ def analysis_route(video_file, subtitle_file):
 
 
 if __name__ == "__main__":
-    run(
-        host=environ.get("SERVER_HOST", "localhost"),
-        port=int(environ.get("SERVER_PORT", "8080")),
-    )
+    host = (environ.get("SERVER_HOST", "localhost"),)
+    port = int(environ.get("SERVER_PORT", "80"))
+    print("Running on {}:{}".format(host, port))
+    run(host=host, port=port)
