@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+Global variables
+"""
 
 from os import environ, getcwd, path
 

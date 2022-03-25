@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+Install setup
+"""
+
 from ast import parse
 from os import path
 
