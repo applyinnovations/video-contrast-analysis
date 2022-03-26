@@ -27,11 +27,10 @@ sed -i '/opencv-python/d' 'requirements.txt'  # python3-opencv is installed abov
 sed 's|VENV|'"$VENV"'|g; s|VARS|'"$VARS"'|g' "$VENV"'/src/video-contrast-analysis/init_scripts/'"$VCA_SERVICE" > "$VCA_SERVICE"
 sudo cp "$VCA_SERVICE" '/etc/systemd/system/'"$VCA_SERVICE"
 sudo cp "$VCA_SERVICE" '/etc/systemd/system/'"$VCA_BUCKET_SERVICE"
-sudo sed -i 's/server/gcloud_bucket_proc/g' '/etc/systemd/system/'"$VCA_BUCKET_SERVICE"
+sudo sed -i 's/server/gcloud_bucket_proc/g ; s/^Description=.*/Description=vca_bucket/' '/etc/systemd/system/'"$VCA_BUCKET_SERVICE"
 
 sudo systemctl daemon-reload
 for service in "$SERVICE" "$VCA_SERVICE"; do
-  sudo systemctl enable "$service"
-  sudo systemctl start "$service"
+  ( sudo systemctl enable "$service" && sudo systemctl start "$service" ) &
   # ( sleep 30 && journalctl --no-pager -u "$service" -n 100 ) &
 done
