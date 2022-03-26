@@ -15,7 +15,7 @@ sudo apt-get install -y git ffmpeg libsm6 libxext6 python3-opencv python3-venv p
 sudo -H python3 -m pip install -U pip
 sudo -H python3 -m pip install -U setuptools wheel
 sudo mkdir -p "$VENV" "$VARS"
-sudo chown -R "$USER":"$(id -gn)" "$VENV" "$VARS"
+sudo chown -R "$(id -un)":"$(id -gn)" "$VENV" "$VARS"
 python3 -m venv --system-site-packages "$VENV"
 
 cd "$VARS"  # Working directory
