@@ -30,7 +30,7 @@ sudo cp "$VCA_SERVICE" '/etc/systemd/system/'"$VCA_BUCKET_SERVICE"
 sudo sed -i 's/server/gcloud_bucket_proc/g ; s/^Description=.*/Description=vca_bucket/' '/etc/systemd/system/'"$VCA_BUCKET_SERVICE"
 
 sudo systemctl daemon-reload
-for service in "$SERVICE" "$VCA_SERVICE"; do
-  ( sudo systemctl enable "$service" && sudo systemctl start "$service" ) &
-  # ( sleep 30 && journalctl --no-pager -u "$service" -n 100 ) &
-done
+sudo systemctl enable "$SERVICE"
+sudo systemctl start "$SERVICE"
+sudo systemctl enable "$VCA_SERVICE"
+sudo systemctl start "$VCA_SERVICE"

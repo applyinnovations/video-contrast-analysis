@@ -9,13 +9,13 @@ Google Cloud Bucket module, with functions to:
 
 import json
 from datetime import datetime
+from socket import gethostname
 from time import sleep
 
-from _socket import gethostname
-from analysis import video_contrast_analysis
 from google.auth.credentials import CredentialsWithQuotaProject
 from google.cloud import pubsub_v1, storage
 
+from video_contrast_analysis.analysis import video_contrast_analysis
 from video_contrast_analysis.globals import CONFIG, CONFIG_FILEPATH
 
 if CONFIG is None:
