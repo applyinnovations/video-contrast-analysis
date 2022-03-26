@@ -2,7 +2,7 @@
 
 # Install requirements on debian, then instantiate 2 services and run them
 
-set -aeuo pipefail
+set -vaeuo pipefail
 
 declare -r VENV='/opt/vca/vca_venv' # Python virtual environment
 declare -r VARS='/opt/vca/var' # Working directory, where to put auth ini &etc.

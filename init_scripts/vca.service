@@ -10,7 +10,8 @@ After=network.target
 Type=simple
 Restart=always
 ExecStart=VENV/bin/python -m video_contrast_analysis.server
-Environment="CONFIG_FILEPATH=VARS/config.ini:PATH=VENV/bin:$PATH"
+Environment="CONFIG_FILEPATH=VARS/config.ini"
+Environment="PATH=VENV/bin:$PATH"
 WorkingDirectory=VARS
 
 [Install]
