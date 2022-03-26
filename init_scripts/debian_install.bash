@@ -4,8 +4,8 @@
 
 set -aeuo pipefail
 
-declare -r VENV='/opt/vca_venv' # Python virtual environment
-declare -r VARS='/opt/vca_var' # Working directory, where to put auth ini &etc.
+declare -r VENV='/opt/vca/vca_venv' # Python virtual environment
+declare -r VARS='/opt/vca/var' # Working directory, where to put auth ini &etc.
 declare -r VCA_SERVICE='vca.service'
 declare -r SERVICE='vca.service'
 declare -r VCA_BUCKET_SERVICE='vca_bucket.service'
