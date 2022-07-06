@@ -3,7 +3,7 @@
 """
 REST API
 """
-
+from socket import gethostname, getfqdn
 from configparser import ConfigParser
 from os import environ
 
@@ -12,6 +12,9 @@ from bottle import get, post, request, run
 import video_contrast_analysis.globals as globals
 from video_contrast_analysis import __version__
 from video_contrast_analysis.analysis import video_contrast_analysis
+
+HOSTNAME = gethostname()
+FQDN = getfqdn()
 
 
 @get("/api/py")
@@ -22,14 +25,8 @@ def version():
     :return: dict with key "config_written_to" with path to config file
     :rtype: ```dict```
     """
-    config_s = request.body.read().decode("utf-8")
-    with open(globals.CONFIG_FILEPATH, "wt") as f:
-        f.write(config_s)
 
-    globals.CONFIG = ConfigParser()
-    globals.CONFIG.read_string(config_s)
-
-    return {"version": __version__}
+    return {"version": __version__, "hostname": HOSTNAME, "fqdn": FQDN}
 
 
 @post("/api/py/set_config")

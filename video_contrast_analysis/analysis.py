@@ -73,10 +73,10 @@ def video_contrast_analysis(video_file, subtitle_file):
 
             # write to output
             f.write(
-                f"contrast {float(round(np.nan_to_num(average_contrast, 0), 3)):.0f}%\n"
-                f"lightness {float(round(average_lightness, 3)):.0f}%\n"
-                f"brightness {float(round(average_brightness, 3)):.0f}%\n"
-                f"colors {int(round(unique_color_count / 1000, 3))}k\n"
+                f"contrast {float(np.round(np.nan_to_num(average_contrast, 0), 3)):.0f}%\n"
+                f"lightness {float(np.round(average_lightness, 3)):.0f}%\n"
+                f"brightness {float(np.round(average_brightness, 3)):.0f}%\n"
+                f"colors {int(np.round(unique_color_count / 1000, 3))}k\n"
                 f"temperature {temperature}\n"
                 "\n"
             )

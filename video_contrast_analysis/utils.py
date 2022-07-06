@@ -6,6 +6,7 @@ Utility functions
 
 from configparser import ConfigParser
 from os import path
+from pprint import PrettyPrinter
 
 
 def get_config(config_filepath):
@@ -26,4 +27,6 @@ def get_config(config_filepath):
     return config
 
 
-__all__ = ["get_config"]
+pp = PrettyPrinter(indent=4).pprint
+
+__all__ = ["get_config", "pp"]

@@ -17,6 +17,7 @@ from google.cloud import pubsub_v1, storage
 
 from video_contrast_analysis.analysis import video_contrast_analysis
 from video_contrast_analysis.globals import CONFIG, CONFIG_FILEPATH
+from video_contrast_analysis.utils import pp
 
 if CONFIG is None:
     raise FileNotFoundError(
@@ -73,14 +74,14 @@ def mk_callback(storage_client, bucket_obj):
         # bucket_id = attributes["bucketId"]
         object_id = attributes["objectId"]
         # generation = attributes["objectGeneration"]
-        print(attributes)
+        pp(attributes)
 
         if attributes["payloadFormat"] == "JSON_API_V1":
             object_metadata = json.loads(data)
             # size = object_metadata["size"]
             # content_type = object_metadata["contentType"]
             # metageneration = object_metadata["metageneration"]
-            print(object_metadata)
+            pp(object_metadata)
 
         if (
             message.attributes.eventType == "OBJECT_FINALIZE"
