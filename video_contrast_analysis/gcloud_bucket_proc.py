@@ -107,7 +107,7 @@ def mk_callback(storage_client, bucket_obj):
     return callback
 
 
-def auth_and_return_client():
+def get_creds():
     """
     Authenticate and return instantiated `storage.Client`
 
@@ -120,37 +120,30 @@ def auth_and_return_client():
     creds.expiry = datetime.utcfromtimestamp(
         int(CONFIG["user"]["google_access_token_expiry"])
     )
-    return storage.Client(
-        project=CONFIG["user"]["google_project_id"], credentials=creds
-    )
+    return creds
 
 
 def start():
     """
     0. Authenticate;
-    1. Create topic;
-    2. Subscribe bucket to topic;
+    1. Get topic from config;
+    2. Subscribe to topic;
     3. Process objects in bucket;
     4. Upload process result back to bucket
     """
-    storage_client = auth_and_return_client()
-
-    # create topic to listen to the bucket
-    topic_name = gethostname()
-
-    bucket_obj = storage_client.bucket(CONFIG["user"]["google_bucket_name"])
-    notification = bucket_obj.notification(topic_name)
-    notification.create()
-
-    # define path to subscribe to
-    subscriber = pubsub_v1.SubscriberClient()
-    subscription_path = subscriber.subscription_path(
-        CONFIG["user"]["google_project_id"], topic_name
+    creds = get_creds()
+    storage_client = storage.Client(
+        project=CONFIG["user"]["google_project_id"], credentials=creds
     )
+    subscriber = pubsub_v1.SubscriberClient(credentials=creds)
 
     # subscribe to the subscription path
+    subscription_path = CONFIG["user"]["google_backend_subscription_name"]
+    
+    bucket_obj = storage_client.bucket(CONFIG["user"]["google_bucket_name"])
+
     subscriber.subscribe(
-        subscription_path, callback=mk_callback(storage_client, bucket_obj)
+        CONFIG["user"]["google_backend_subscription_name"], callback=mk_callback(storage_client, bucket_obj)
     )
 
     print("Listening for messages on {}".format(subscription_path))
@@ -160,10 +153,6 @@ def start():
     # exiting to allow it to process messages in the background.
     while True:
         sleep(60)
-
-    # TODO: [question for Sam] when instance has ended need to delete the subscription that was created
-    # notification.delete()
-
 
 if __name__ == "__main__":
     start()
