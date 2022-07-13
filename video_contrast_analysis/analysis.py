@@ -85,4 +85,3 @@ def video_contrast_analysis(video_file, subtitle_file):
     f.close()
 
 __all__ = ["video_contrast_analysis"]
-video_contrast_analysis("Apply-Concept1-2.mp4", "Apply-Concept1-2.mp4.srt")
