@@ -9,7 +9,7 @@ After=network.target
 [Service]
 Type=simple
 Restart=always
-ExecStart=VENV/bin/python -m video_contrast_analysis.server
+ExecStart=VENV/bin/python -u -m video_contrast_analysis.server
 Environment="CONFIG_FILEPATH=VARS/config.ini"
 Environment="PATH=VENV/bin:$PATH"
 WorkingDirectory=VARS
