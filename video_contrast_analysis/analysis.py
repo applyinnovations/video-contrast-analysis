@@ -22,11 +22,12 @@ def video_contrast_analysis(video_file, subtitle_file):
 
     with open(subtitle_file, "w") as f:
         if not capture.isOpened():
-            print("Unable to open: {!r}".format(video_file))
-            exit(2)
+            print("Unable to open: {!r}".format(subtitle_file))
+            raise Exception("Unable to open subtitle file")
 
     previous_timestamp = "00:00:00,000"
     line_count = 0
+    f = open(subtitle_file, "a")
 
     while True:
         ret, frame = capture.read()
@@ -81,6 +82,6 @@ def video_contrast_analysis(video_file, subtitle_file):
                 "\n"
             )
         previous_timestamp = current_timestamp
-
+    f.close()
 
 __all__ = ["video_contrast_analysis"]

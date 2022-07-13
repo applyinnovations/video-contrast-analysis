@@ -1,5 +1,6 @@
 *.mov
 *.srt
+*.mp4
 .idea
 .vscode
 venv

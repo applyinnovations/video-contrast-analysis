@@ -65,45 +65,30 @@ def mk_callback(storage_client, bucket_obj):
 
     def callback(message):
         """callback to run when subscription received"""
-        print("Received message:\n")
         message.ack()
-        attributes = message.attributes
-        data = message.data.decode("utf-8")
+        pp({"message": message})
+        payload_format = message.attributes["payloadFormat"]
+        event_type = message.attributes["eventType"]
 
-        # event_type = attributes["eventType"]
-        # bucket_id = attributes["bucketId"]
-        object_id = attributes["objectId"]
-        # generation = attributes["objectGeneration"]
-        pp(attributes)
-
-        if attributes["payloadFormat"] == "JSON_API_V1":
+        if payload_format == "JSON_API_V1" and event_type == "OBJECT_FINALIZE":
+            data = message.data.decode("utf-8")
             object_metadata = json.loads(data)
-            # size = object_metadata["size"]
-            # content_type = object_metadata["contentType"]
-            # metageneration = object_metadata["metageneration"]
-            pp(object_metadata)
+            if "video" in object_metadata["contentType"]:
+                in_fname = object_metadata["name"]
+                out_fname = in_fname + ".srt"
+                blob_uri = "gs://{}/{}".format(object_metadata["bucket"], object_metadata["name"])
+                try:
+                    with open(in_fname, "wb") as f:
+                        storage_client.download_blob_to_file(blob_uri, f)
+                    video_contrast_analysis(in_fname, out_fname)
+                    blob = bucket_obj.blob(out_fname)
+                    blob.upload_from_filename(out_fname)
 
-        if (
-            message.attributes.eventType == "OBJECT_FINALIZE"
-        ):  # TODO: check that the content_type is supported by opencv
-            # new file was created / updated
-            in_fname = "video"
-            out_fname = "video_contrast_analysis.srt"
-
-            try:
-                with open(in_fname, "wb") as f:
-                    storage_client.download_blob_to_file(object_id, f)
-                video_contrast_analysis(in_fname, out_fname)
-            except:
-                print(
-                    "Processing step failed on {!r} to {!r}".format(in_fname, out_fname)
-                )
-
-            try:
-                blob = bucket_obj.blob("{}_{}".format(object_id, out_fname))
-                blob.upload_from_filename(out_fname)
-            except:
-                print("Failed to upload {!r} to {!r}".format(out_fname, object_id))
+                except:
+                    print(
+                        "Processing step failed on {!r} to {!r}".format(in_fname, out_fname)
+                    )
+                    raise
 
     return callback
 
