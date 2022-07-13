@@ -18,6 +18,7 @@ sudo chown -R "$(id -un)":"$(id -gn)" "$VENV" "$VARS"
 python3 -m venv --system-site-packages "$VENV"
 
 cd "$VARS"  # Working directory
+"$VENV"'/bin/python' -m pip install --upgrade pip
 curl -OL 'https://raw.githubusercontent.com/applyinnovations/video-contrast-analysis/master/requirements.txt'
 sed -i '/opencv-python/d' 'requirements.txt'  # python3-opencv is installed above and included with `--system-site-packages`
 "$VENV"'/bin/python' -m pip install -r "$VARS"'/requirements.txt'
