@@ -13,7 +13,7 @@ sudo apt-get update -qq
 sudo apt-get install -y git ffmpeg libsm6 libxext6 python3-venv python3-pip cython3
 
 # install python3-opencv from source to get latest version
-sudo apt-get install build-essential cmake git pkg-config libgtk-3-dev \
+sudo apt-get install -y build-essential cmake git pkg-config libgtk-3-dev \
     libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
     libxvidcore-dev libx264-dev libjpeg-dev libpng-dev libtiff-dev \
     gfortran openexr libatlas-base-dev python3-dev python3-numpy \
