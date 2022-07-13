@@ -7,13 +7,12 @@ set -vaeuo pipefail
 declare -r VENV='/opt/vca/vca_venv' # Python virtual environment
 declare -r VARS='/opt/vca/var' # Working directory, where to put auth ini &etc.
 declare -r VCA_SERVICE='vca.service'
-declare -r SERVICE='vca.service'
 declare -r VCA_BUCKET_SERVICE='vca_bucket.service'
 
 sudo apt-get update -qq
-sudo apt-get install -y git ffmpeg libsm6 libxext6 python3-opencv python3-venv python3-pip
-sudo -H python3 -m pip install -U pip
+sudo apt-get install -y git ffmpeg libsm6 libxext6 python3-opencv python3-venv python3-pip cython3
 sudo -H python3 -m pip install -U setuptools wheel
+sudo -H python3 -m pip install -U pip
 sudo mkdir -p "$VENV" "$VARS"
 sudo chown -R "$(id -un)":"$(id -gn)" "$VENV" "$VARS"
 python3 -m venv --system-site-packages "$VENV"
@@ -30,7 +29,7 @@ sudo cp "$VCA_SERVICE" '/etc/systemd/system/'"$VCA_BUCKET_SERVICE"
 sudo sed -i 's/server/gcloud_bucket_proc/g ; s/^Description=.*/Description=vca_bucket/' '/etc/systemd/system/'"$VCA_BUCKET_SERVICE"
 
 sudo systemctl daemon-reload
-sudo systemctl enable "$SERVICE"
-sudo systemctl start "$SERVICE"
 sudo systemctl enable "$VCA_SERVICE"
 sudo systemctl start "$VCA_SERVICE"
+sudo systemctl enable "$VCA_BUCKET_SERVICE"
+sudo systemctl start "$VCA_BUCKET_SERVICE"
