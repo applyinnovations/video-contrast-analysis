@@ -46,6 +46,20 @@ def set_config_route():
 
     return {"config_written_to": globals.CONFIG_FILEPATH}
 
+@post("/api/py/analyse/<video_file>/<subtitle_file>")
+def analysis_route(video_file, subtitle_file):
+    """
+    Run analysis using URL path as arguments
+    :param video_file: Filepath to video_file (in format supported by OpenCV)
+    :type video_file: ```str```
+    :param subtitle_file: Filepath to write subtitles to in SRT format
+    :type subtitle_file: ```str```
+    :return: `{"video_analysed": True}`
+    :rtype: ```dict```
+    """
+    video_contrast_analysis(video_file=video_file, subtitle_file=subtitle_file)
+
+    return {"video_analysed": True}
 
 if __name__ == "__main__":
     host = environ.get("SERVER_HOST", "0.0.0.0")
