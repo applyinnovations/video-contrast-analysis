@@ -73,16 +73,24 @@ def mk_callback(storage_client, bucket_obj):
         if payload_format == "JSON_API_V1" and event_type == "OBJECT_FINALIZE":
             data = message.data.decode("utf-8")
             object_metadata = json.loads(data)
+            print("Object finalized")
             if "video" in object_metadata["contentType"]:
+                print("Video detected")
                 in_fname = object_metadata["name"]
                 out_fname = in_fname + ".srt"
                 blob_uri = "gs://{}/{}".format(object_metadata["bucket"], object_metadata["name"])
                 try:
+                    print("Downloading file {} to ".format(blob_uri, in_fname))
                     with open(in_fname, "wb") as f:
                         storage_client.download_blob_to_file(blob_uri, f)
+                    print("File downloaded successfully")
+                    print("Starting process {} => {}".format(in_fname, out_fname))
                     video_contrast_analysis(in_fname, out_fname)
+                    print("Process completed")
                     blob = bucket_obj.blob(out_fname)
+                    print("Created blob")
                     blob.upload_from_filename(out_fname)
+                    print("Uploaded blob")
 
                 except:
                     print(
