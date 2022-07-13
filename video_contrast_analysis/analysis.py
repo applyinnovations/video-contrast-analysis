@@ -63,8 +63,8 @@ def video_contrast_analysis(video_file, subtitle_file):
 
             # Color count
             rgb = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-            colors = np.dot(rgb.astype(np.uint32), [1, 256, 65536])
-            unique_color_count = len(np.unique(colors))
+            # colors = np.dot(rgb.astype(np.uint32), [1, 256, 65536])
+            # unique_color_count = len(np.unique(colors))
 
             # Warmth
             R, G, B = cv.split(rgb)
@@ -77,7 +77,7 @@ def video_contrast_analysis(video_file, subtitle_file):
                 f"contrast {float(np.round(np.nan_to_num(average_contrast, 0), 3)):.0f}%\n"
                 f"lightness {float(np.round(average_lightness, 3)):.0f}%\n"
                 f"brightness {float(np.round(average_brightness, 3)):.0f}%\n"
-                f"colors {int(np.round(unique_color_count / 1000, 3))}k\n"
+                # f"colors {int(np.round(unique_color_count / 1000, 3))}k\n"
                 f"temperature {temperature}\n"
                 "\n"
             )
@@ -85,3 +85,4 @@ def video_contrast_analysis(video_file, subtitle_file):
     f.close()
 
 __all__ = ["video_contrast_analysis"]
+video_contrast_analysis("Apply-Concept1-2.mp4", "Apply-Concept1-2.mp4.srt")

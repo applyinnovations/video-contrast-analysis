@@ -74,6 +74,7 @@ def mk_callback(storage_client, bucket_obj):
             data = message.data.decode("utf-8")
             object_metadata = json.loads(data)
             print("Object finalized")
+            pp({object_metadata: object_metadata})
             if "video" in object_metadata["contentType"]:
                 print("Video detected")
                 in_fname = object_metadata["name"]
