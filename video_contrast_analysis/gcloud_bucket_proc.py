@@ -9,8 +9,8 @@ Google Cloud Bucket module, with functions to:
 
 import json
 from datetime import datetime
-from socket import gethostname
 from time import sleep
+from mimetypes import guess_type
 
 from google.auth.credentials import CredentialsWithQuotaProject
 from google.cloud import pubsub_v1, storage
@@ -75,24 +75,26 @@ def mk_callback(storage_client, bucket_obj):
             object_metadata = json.loads(data)
             print("Object finalized")
             pp({object_metadata: object_metadata})
-            if "video" in object_metadata["contentType"]:
+            if "video" in object_metadata["contentType"] or object_metadata["contentType"] == "application/octet-stream":
                 print("Video detected")
                 in_fname = object_metadata["name"]
                 out_fname = in_fname + ".srt"
                 blob_uri = "gs://{}/{}".format(object_metadata["bucket"], object_metadata["name"])
                 try:
-                    print("Downloading file {} to ".format(blob_uri, in_fname))
+                    print("Downloading file {} to {}".format(blob_uri, in_fname))
                     with open(in_fname, "wb") as f:
                         storage_client.download_blob_to_file(blob_uri, f)
                     print("File downloaded successfully")
-                    print("Starting process {} => {}".format(in_fname, out_fname))
-                    video_contrast_analysis(in_fname, out_fname)
-                    print("Process completed")
-                    blob = bucket_obj.blob(out_fname)
-                    print("Created blob")
-                    blob.upload_from_filename(out_fname)
-                    print("Uploaded blob")
-
+                    if (guess_type('file_path')[0].startswith('video')):
+                        print("Starting process {} => {}".format(in_fname, out_fname))
+                        video_contrast_analysis(in_fname, out_fname)
+                        print("Process completed")
+                        blob = bucket_obj.blob(out_fname)
+                        print("Created blob")
+                        blob.upload_from_filename(out_fname)
+                        print("Uploaded blob")
+                    else:
+                        print("Downloaded file does not seem like a video")
                 except:
                     print(
                         "Processing step failed on {!r} to {!r}".format(in_fname, out_fname)
