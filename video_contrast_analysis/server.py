@@ -3,9 +3,9 @@
 """
 REST API
 """
-from socket import gethostname, getfqdn
 from configparser import ConfigParser
 from os import environ
+from socket import getfqdn, gethostname
 
 from bottle import get, post, request, run
 
@@ -46,6 +46,7 @@ def set_config_route():
 
     return {"config_written_to": globals.CONFIG_FILEPATH}
 
+
 @post("/api/py/analyse/<video_file>/<subtitle_file>")
 def analysis_route(video_file, subtitle_file):
     """
@@ -61,9 +62,9 @@ def analysis_route(video_file, subtitle_file):
 
     return {"video_analysed": True}
 
+
 if __name__ == "__main__":
     host = environ.get("SERVER_HOST", "0.0.0.0")
     port = int(environ.get("SERVER_PORT", "80"))
     print("Running on {}:{}".format(host, port))
     run(host=host, port=port)
-    

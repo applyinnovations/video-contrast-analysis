@@ -9,9 +9,11 @@ Google Cloud Bucket module, with functions to:
 
 import json
 from datetime import datetime
-from time import sleep
 from mimetypes import guess_type
+from time import sleep
 
+import google_auth_httplib2
+import httplib2
 from google.auth.credentials import CredentialsWithQuotaProject
 from google.cloud import pubsub_v1, storage
 
@@ -51,6 +53,27 @@ class CredentialsRefreshable(CredentialsWithQuotaProject):
         pass  # TODO
 
 
+def refresh_the_token(client_id, client_secret, refresh_token):
+    refresh_http = httplib2.Http()
+    # if HAS_GOOGLE_AUTH and isinstance(self, Credentials):
+    request = google_auth_httplib2.Request(refresh_http)
+    response = request(
+        "https://oauth2.googleapis.com/token?"
+        "grant_type=refresh_token&"
+        "client_id={client_id}&"
+        "client_secret={client_secret}&"
+        "refresh_token={refresh_token}".format(
+            client_id=client_id,
+            client_secret=client_secret,
+            refresh_token=refresh_token,
+        )
+    )
+    if response.status == 200:
+        return {key: response.data[key] for key in ("access_token", "expires_in")}
+    else:
+        raise Exception(response.data)
+
+
 def mk_callback(storage_client, bucket_obj):
     """
     :param storage_client: storage.Client
@@ -75,17 +98,22 @@ def mk_callback(storage_client, bucket_obj):
             object_metadata = json.loads(data)
             print("Object finalized")
             pp({"object_metadata": object_metadata})
-            if "video" in object_metadata["contentType"] or object_metadata["contentType"] == "application/octet-stream":
+            if (
+                "video" in object_metadata["contentType"]
+                or object_metadata["contentType"] == "application/octet-stream"
+            ):
                 print("Video detected")
                 in_fname = object_metadata["name"]
                 out_fname = in_fname + ".srt"
-                blob_uri = "gs://{}/{}".format(object_metadata["bucket"], object_metadata["name"])
+                blob_uri = "gs://{}/{}".format(
+                    object_metadata["bucket"], object_metadata["name"]
+                )
                 try:
                     print("Downloading file {} to {}".format(blob_uri, in_fname))
                     with open(in_fname, "wb") as f:
                         storage_client.download_blob_to_file(blob_uri, f)
                     print("File downloaded successfully")
-                    if (guess_type(in_fname)[0].startswith('video')):
+                    if guess_type(in_fname)[0].startswith("video"):
                         print("Starting process {} => {}".format(in_fname, out_fname))
                         video_contrast_analysis(in_fname, out_fname)
                         print("Process completed")
@@ -97,7 +125,9 @@ def mk_callback(storage_client, bucket_obj):
                         print("Downloaded file does not seem like a video")
                 except:
                     print(
-                        "Processing step failed on {!r} to {!r}".format(in_fname, out_fname)
+                        "Processing step failed on {!r} to {!r}".format(
+                            in_fname, out_fname
+                        )
                     )
                     raise
 
@@ -136,20 +166,22 @@ def start():
 
     # subscribe to the subscription path
     subscription_path = CONFIG["user"]["google_backend_subscription_name"]
-    
+
     bucket_obj = storage_client.bucket(CONFIG["user"]["google_bucket_name"])
 
     subscriber.subscribe(
-        CONFIG["user"]["google_backend_subscription_name"], callback=mk_callback(storage_client, bucket_obj)
+        CONFIG["user"]["google_backend_subscription_name"],
+        callback=mk_callback(storage_client, bucket_obj),
     )
 
-    print("Listening for messages on {}".format(subscription_path))
+    print("Listening for messages on", subscription_path)
 
     # TODO: [question for Sam] this may not be needed depends if this is done elsewhere
     # The subscriber is non-blocking, so we must keep the main thread from
     # exiting to allow it to process messages in the background.
     while True:
         sleep(60)
+
 
 if __name__ == "__main__":
     start()

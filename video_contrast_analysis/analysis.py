@@ -84,4 +84,5 @@ def video_contrast_analysis(video_file, subtitle_file):
         previous_timestamp = current_timestamp
     f.close()
 
+
 __all__ = ["video_contrast_analysis"]
