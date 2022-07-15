@@ -73,6 +73,8 @@ class CredentialsRefreshable(CredentialsWithQuotaProject):
             raise Exception(response.data)
 
 
+last_message_recieved = datetime.now()
+
 def mk_callback(storage_client, bucket_obj):
     """
     :param storage_client: storage.Client
@@ -87,6 +89,8 @@ def mk_callback(storage_client, bucket_obj):
 
     def callback(message):
         """callback to run when subscription received"""
+        global last_message_recieved
+        last_message_recieved = datetime.now()
         message.ack()
         pp({"message": message})
         payload_format = message.attributes["payloadFormat"]
@@ -147,7 +151,6 @@ def get_creds():
     )
     return creds
 
-
 def start():
     """
     0. Authenticate;
@@ -179,7 +182,8 @@ def start():
     # exiting to allow it to process messages in the background.
     while True:
         sleep(60)
-
+        if last_message_recieved < datetime.datetime.now() - datetime.timedelta(minutes=15):
+            os.system('systemctl poweroff')
 
 if __name__ == "__main__":
     start()
