@@ -15,7 +15,7 @@ from time import sleep
 import google_auth_httplib2
 import httplib2
 from google.auth.credentials import CredentialsWithQuotaProject
-from google.cloud import pubsub_v1, storage
+from google.cloud import pubsub_v1, storage, compute_v1
 
 from video_contrast_analysis.analysis import video_contrast_analysis
 from video_contrast_analysis.globals import CONFIG, CONFIG_FILEPATH
@@ -151,6 +151,25 @@ def get_creds():
     )
     return creds
 
+delete_request_created = False
+
+def delete_instance() -> None:
+    """
+    Send an instance deletion request to the Compute Engine API and wait for it to complete.
+
+    Args:
+        project_id: project ID or project number of the Cloud project you want to use.
+        zone: name of the zone you want to use. For example: “us-west3-b”
+        machine_name: name of the machine you want to delete.
+    """
+    global delete_request_created 
+    delete_request_created = True
+    instance_client = compute_v1.InstancesClient()
+    print("Timeout reached, deleting instance.")
+    instance_client.delete(
+        project=CONFIG["user"]["google_project_id"], zone=CONFIG["user"]["google_zone"], instance=CONFIG["user"]["google_instance_name"]
+    )
+
 def start():
     """
     0. Authenticate;
@@ -182,8 +201,8 @@ def start():
     # exiting to allow it to process messages in the background.
     while True:
         sleep(60)
-        if last_message_recieved < datetime.now() - timedelta(minutes=15):
-            os.system('systemctl poweroff')
+        if last_message_recieved < datetime.now() - timedelta(minutes=15) and not delete_request_created:
+            delete_instance()
 
 if __name__ == "__main__":
     start()
