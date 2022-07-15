@@ -8,7 +8,7 @@ Google Cloud Bucket module, with functions to:
 """
 
 import json, os
-from datetime import datetime
+from datetime import datetime, timedelta
 from mimetypes import guess_type
 from time import sleep
 
@@ -182,7 +182,7 @@ def start():
     # exiting to allow it to process messages in the background.
     while True:
         sleep(60)
-        if last_message_recieved < datetime.datetime.now() - datetime.timedelta(minutes=15):
+        if last_message_recieved < datetime.now() - timedelta(minutes=15):
             os.system('systemctl poweroff')
 
 if __name__ == "__main__":
