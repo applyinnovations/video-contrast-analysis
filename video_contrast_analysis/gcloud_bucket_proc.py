@@ -50,28 +50,26 @@ class CredentialsRefreshable(CredentialsWithQuotaProject):
 
     def refresh(self, request):
         """Generate refresh token"""
-        pass  # TODO
-
-
-def refresh_the_token(client_id, client_secret, refresh_token):
-    refresh_http = httplib2.Http()
-    # if HAS_GOOGLE_AUTH and isinstance(self, Credentials):
-    request = google_auth_httplib2.Request(refresh_http)
-    response = request(
-        "https://oauth2.googleapis.com/token?"
-        "grant_type=refresh_token&"
-        "client_id={client_id}&"
-        "client_secret={client_secret}&"
-        "refresh_token={refresh_token}".format(
-            client_id=client_id,
-            client_secret=client_secret,
-            refresh_token=refresh_token,
+        refresh_http = httplib2.Http()
+        request = google_auth_httplib2.Request(refresh_http)
+        response = request(
+            "https://oauth2.googleapis.com/token?"
+            "grant_type=refresh_token&"
+            "client_id={client_id}&"
+            "client_secret={client_secret}&"
+            "refresh_token={refresh_token}".format(
+                client_id=CONFIG["user"]["client_id"],
+                client_secret=CONFIG["user"]["client_secret"],
+                refresh_token=CONFIG["user"]["google_refresh_token"],
+            )
         )
-    )
-    if response.status == 200:
-        return {key: response.data[key] for key in ("access_token", "expires_in")}
-    else:
-        raise Exception(response.data)
+        if response.status == 200:
+            self.token = response.data["access_token"]
+            self.expiry = datetime.utcfromtimestamp(
+                int(response.data["expires_in"])
+            )
+        else:
+            raise Exception(response.data)
 
 
 def mk_callback(storage_client, bucket_obj):
