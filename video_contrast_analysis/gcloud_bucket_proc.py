@@ -28,6 +28,7 @@ if CONFIG is None:
         )
     )
 
+DWNLD_DIR = "/tmp/downloads/"
 
 class CredentialsRefreshable(CredentialsWithQuotaProject):
     """
@@ -90,19 +91,17 @@ def mk_callback(storage_client, bucket_obj):
         pp({"message": message})
         payload_format = message.attributes["payloadFormat"]
         event_type = message.attributes["eventType"]
-
         if payload_format == "JSON_API_V1" and event_type == "OBJECT_FINALIZE":
             data = message.data.decode("utf-8")
             object_metadata = json.loads(data)
-            print("Object finalized")
             pp({"object_metadata": object_metadata})
             if (
+                "contentType" in object_metadata and (
                 "video" in object_metadata["contentType"]
-                or object_metadata["contentType"] == "application/octet-stream"
+                or object_metadata["contentType"] == "application/octet-stream")
             ):
-                print("Video detected")
-                in_fname = object_metadata["name"]
-                out_fname = in_fname + ".srt"
+                in_fname = DWNLD_DIR + object_metadata["name"]
+                out_fname = DWNLD_DIR + in_fname + ".srt"
                 blob_uri = "gs://{}/{}".format(
                     object_metadata["bucket"], object_metadata["name"]
                 )
@@ -114,21 +113,19 @@ def mk_callback(storage_client, bucket_obj):
                     if guess_type(in_fname)[0].startswith("video"):
                         print("Starting process {} => {}".format(in_fname, out_fname))
                         video_contrast_analysis(in_fname, out_fname)
-                        print("Process completed")
-                        blob = bucket_obj.blob(out_fname)
-                        print("Created blob")
+                        output_name = object_metadata["name"] + ".srt"
+                        blob = bucket_obj.blob(output_name)
                         blob.upload_from_filename(out_fname)
-                        print("Uploaded blob")
+                        print("Process complete - Uploaded {} as {}".format(out_fname, output_name))
                     else:
                         print("Downloaded file does not seem like a video")
                 except:
                     print(
-                        "Processing step failed on {!r} to {!r}".format(
+                        "Processing failed on {!r} to {!r}".format(
                             in_fname, out_fname
                         )
                     )
                     raise
-
     return callback
 
 
