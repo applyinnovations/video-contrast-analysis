@@ -105,7 +105,7 @@ def mk_callback(storage_client, bucket_obj):
                 or object_metadata["contentType"] == "application/octet-stream")
             ):
                 in_fname = DWNLD_DIR + object_metadata["name"]
-                out_fname = DWNLD_DIR + in_fname + ".srt"
+                out_fname = in_fname + ".srt"
                 blob_uri = "gs://{}/{}".format(
                     object_metadata["bucket"], object_metadata["name"]
                 )
