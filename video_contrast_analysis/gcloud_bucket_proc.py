@@ -151,25 +151,6 @@ def get_creds():
     )
     return creds
 
-delete_request_created = False
-
-def delete_instance() -> None:
-    """
-    Send an instance deletion request to the Compute Engine API and wait for it to complete.
-
-    Args:
-        project_id: project ID or project number of the Cloud project you want to use.
-        zone: name of the zone you want to use. For example: “us-west3-b”
-        machine_name: name of the machine you want to delete.
-    """
-    global delete_request_created 
-    delete_request_created = True
-    instance_client = compute_v1.InstancesClient()
-    print("Timeout reached, deleting instance.")
-    instance_client.delete(
-        project=CONFIG["user"]["google_project_id"], zone=CONFIG["user"]["google_zone"], instance=CONFIG["user"]["google_instance_name"]
-    )
-
 def start():
     """
     0. Authenticate;
@@ -199,10 +180,16 @@ def start():
     # TODO: [question for Sam] this may not be needed depends if this is done elsewhere
     # The subscriber is non-blocking, so we must keep the main thread from
     # exiting to allow it to process messages in the background.
+    delete_request_created = False
     while True:
         sleep(60)
         if last_message_recieved < datetime.now() - timedelta(minutes=15) and not delete_request_created:
-            delete_instance()
+            delete_request_created = True
+            instance_client = compute_v1.InstancesClient(credentials=creds)
+            print("Timeout reached, deleting instance.")
+            instance_client.delete(
+                project=CONFIG["user"]["google_project_id"], zone=CONFIG["user"]["google_zone"], instance=CONFIG["user"]["google_instance_name"]
+            )
 
 if __name__ == "__main__":
     start()
