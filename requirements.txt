@@ -4,3 +4,4 @@ numpy
 bottle
 google-cloud-storage
 google-cloud-pubsub
+google_auth_httplib2

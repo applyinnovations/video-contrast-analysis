@@ -52,7 +52,7 @@ class CredentialsRefreshable(CredentialsWithQuotaProject):
         """Generate refresh token"""
         refresh_http = httplib2.Http()
         request = google_auth_httplib2.Request(refresh_http)
-        response = request(
+        response, content = request(
             "https://oauth2.googleapis.com/token?"
             "grant_type=refresh_token&"
             "client_id={client_id}&"
