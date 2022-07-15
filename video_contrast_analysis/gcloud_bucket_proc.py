@@ -7,7 +7,7 @@ Google Cloud Bucket module, with functions to:
   - upload result of run to same bucket.
 """
 
-import json
+import json, os
 from datetime import datetime
 from mimetypes import guess_type
 from time import sleep
@@ -107,6 +107,9 @@ def mk_callback(storage_client, bucket_obj):
                 )
                 try:
                     print("Downloading file {} to {}".format(blob_uri, in_fname))
+                    dirname = os.path.dirname(in_fname)
+                    if not os.path.exists(dirname):
+                        os.makedirs(dirname)
                     with open(in_fname, "wb") as f:
                         storage_client.download_blob_to_file(blob_uri, f)
                     print("File downloaded successfully")
