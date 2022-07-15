@@ -10,8 +10,8 @@ declare -r VCA_SERVICE='vca.service'
 declare -r VCA_BUCKET_SERVICE='vca_bucket.service'
 
 # install google ops agent
-curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
-sudo bash add-google-cloud-ops-agent-repo.sh --also-install
+# curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+# sudo bash add-google-cloud-ops-agent-repo.sh --also-install
 
 sudo apt-get update -qq
 sudo apt-get install -y git ffmpeg libsm6 libxext6 python3-venv python3-pip cython3
