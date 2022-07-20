@@ -117,7 +117,8 @@ def mk_callback(storage_client, bucket_obj):
                     with open(in_fname, "wb") as f:
                         storage_client.download_blob_to_file(blob_uri, f)
                     print("File downloaded successfully")
-                    if guess_type(in_fname)[0].startswith("video"):
+                    file_type = guess_type(in_fname)
+                    if file_type is not None and file_type[0].startswith("video"):
                         print("Starting process {} => {}".format(in_fname, out_fname))
                         video_contrast_analysis(in_fname, out_fname)
                         output_name = object_metadata["name"] + ".srt"
