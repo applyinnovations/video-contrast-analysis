@@ -99,41 +99,36 @@ def mk_callback(storage_client, bucket_obj):
             data = message.data.decode("utf-8")
             object_metadata = json.loads(data)
             pp({"object_metadata": object_metadata})
-            if (
-                "contentType" in object_metadata and (
-                "video" in object_metadata["contentType"]
-                or object_metadata["contentType"] == "application/octet-stream")
-            ):
-                in_fname = DWNLD_DIR + object_metadata["name"]
-                out_fname = in_fname + ".srt"
-                blob_uri = "gs://{}/{}".format(
-                    object_metadata["bucket"], object_metadata["name"]
-                )
-                try:
-                    print("Downloading file {} to {}".format(blob_uri, in_fname))
-                    dirname = os.path.dirname(in_fname)
-                    if not os.path.exists(dirname):
-                        os.makedirs(dirname)
-                    with open(in_fname, "wb") as f:
-                        storage_client.download_blob_to_file(blob_uri, f)
-                    print("File downloaded successfully")
-                    file_type = guess_type(in_fname)
-                    if file_type is not None and file_type[0].startswith("video"):
-                        print("Starting process {} => {}".format(in_fname, out_fname))
-                        video_contrast_analysis(in_fname, out_fname)
-                        output_name = object_metadata["name"] + ".srt"
-                        blob = bucket_obj.blob(output_name)
-                        blob.upload_from_filename(out_fname)
-                        print("Process complete - Uploaded {} as {}".format(out_fname, output_name))
-                    else:
-                        print("Downloaded file does not seem like a video")
-                except:
-                    print(
-                        "Processing failed on {!r} to {!r}".format(
-                            in_fname, out_fname
-                        )
+            in_fname = DWNLD_DIR + object_metadata["name"]
+            out_fname = in_fname + ".srt"
+            blob_uri = "gs://{}/{}".format(
+                object_metadata["bucket"], object_metadata["name"]
+            )
+            try:
+                print("Downloading file {} to {}".format(blob_uri, in_fname))
+                dirname = os.path.dirname(in_fname)
+                if not os.path.exists(dirname):
+                    os.makedirs(dirname)
+                with open(in_fname, "wb") as f:
+                    storage_client.download_blob_to_file(blob_uri, f)
+                print("File downloaded successfully")
+                file_type = guess_type(in_fname)
+                if file_type is not None and file_type[0].startswith("video"):
+                    print("Starting process {} => {}".format(in_fname, out_fname))
+                    video_contrast_analysis(in_fname, out_fname)
+                    output_name = object_metadata["name"] + ".srt"
+                    blob = bucket_obj.blob(output_name)
+                    blob.upload_from_filename(out_fname)
+                    print("Process complete - Uploaded {} as {}".format(out_fname, output_name))
+                else:
+                    print("Downloaded file does not seem like a video")
+            except:
+                print(
+                    "Processing failed on {!r} to {!r}".format(
+                        in_fname, out_fname
                     )
-                    raise
+                )
+                raise
     return callback
 
 
