@@ -120,6 +120,8 @@ def mk_callback(storage_client, bucket_obj):
                     blob = bucket_obj.blob(output_name)
                     blob.upload_from_filename(out_fname)
                     print("Process complete - Uploaded {} as {}".format(out_fname, output_name))
+                    os.remove(in_fname)
+                    os.remove(out_fname)
                 else:
                     print("Downloaded file does not seem like a video")
             except:
@@ -179,7 +181,7 @@ def start():
     delete_request_created = False
     while True:
         sleep(60)
-        if last_message_recieved < datetime.now() - timedelta(minutes=15) and not delete_request_created:
+        if last_message_recieved < datetime.now() - timedelta(minutes=120) and not delete_request_created:
             delete_request_created = True
             instance_client = compute_v1.InstancesClient(credentials=creds)
             print("Timeout reached, deleting instance.")
