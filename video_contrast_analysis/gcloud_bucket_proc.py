@@ -30,6 +30,9 @@ if CONFIG is None:
 
 DWNLD_DIR = "/tmp/downloads/"
 
+print("CONFIG:")
+print(CONFIG)
+
 class CredentialsRefreshable(CredentialsWithQuotaProject):
     """
     `class` to enable credentials to be provided out-of-band
