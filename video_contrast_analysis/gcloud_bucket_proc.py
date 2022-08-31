@@ -65,7 +65,7 @@ class CredentialsRefreshable(CredentialsWithQuotaProject):
                 client_id=CONFIG["user"]["client_id"],
                 client_secret=CONFIG["user"]["client_secret"],
                 refresh_token=CONFIG["user"]["google_refresh_token"],
-            )
+            ), "POST"
         )
         if response.status == 200:
             self.token = response.data["access_token"]
