@@ -65,8 +65,9 @@ class CredentialsRefreshable(CredentialsWithQuotaProject):
             ), "POST"
         )
         if response.status == 200:
-            self.token = response.data["access_token"]
-            self.expiry = datetime.now() + timedelta(seconds=int(response.data["expires_in"]))
+            data = json.loads(response.data)
+            self.token = data["access_token"]
+            self.expiry = datetime.now() + timedelta(seconds=int(data["expires_in"]))
         else:
             raise Exception(response.data)
 
