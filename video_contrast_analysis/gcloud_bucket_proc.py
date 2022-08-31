@@ -56,7 +56,7 @@ class CredentialsRefreshable(CredentialsWithQuotaProject):
         """Generate refresh token"""
         refresh_http = httplib2.Http()
         request = google_auth_httplib2.Request(refresh_http)
-        response, content = request(
+        response = request(
             "https://oauth2.googleapis.com/token?"
             "grant_type=refresh_token&"
             "client_id={client_id}&"
@@ -67,6 +67,7 @@ class CredentialsRefreshable(CredentialsWithQuotaProject):
                 refresh_token=CONFIG["user"]["google_refresh_token"],
             ), "POST"
         )
+        print(response)
         if response.status == 200:
             self.token = response.data["access_token"]
             self.expiry = datetime.utcfromtimestamp(
