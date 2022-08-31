@@ -67,7 +67,10 @@ class CredentialsRefreshable(CredentialsWithQuotaProject):
                 refresh_token=CONFIG["user"]["google_refresh_token"],
             ), "POST"
         )
-        print(response)
+        print("response.status:")
+        print(response.status)
+        print("response.data:")
+        print(response.data)
         if response.status == 200:
             self.token = response.data["access_token"]
             self.expiry = datetime.utcfromtimestamp(
