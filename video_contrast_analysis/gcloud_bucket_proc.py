@@ -30,9 +30,6 @@ if CONFIG is None:
 
 DWNLD_DIR = "/tmp/downloads/"
 
-print("CONFIG:")
-print(CONFIG)
-
 class CredentialsRefreshable(CredentialsWithQuotaProject):
     """
     `class` to enable credentials to be provided out-of-band
@@ -67,15 +64,9 @@ class CredentialsRefreshable(CredentialsWithQuotaProject):
                 refresh_token=CONFIG["user"]["google_refresh_token"],
             ), "POST"
         )
-        print("response.status:")
-        print(response.status)
-        print("response.data:")
-        print(response.data)
         if response.status == 200:
             self.token = response.data["access_token"]
-            self.expiry = datetime.utcfromtimestamp(
-                int(response.data["expires_in"])
-            )
+            self.expiry = datetime.now() + timedelta(seconds=int(response.data["expires_in"]))
         else:
             raise Exception(response.data)
 
